@@ -31,7 +31,7 @@ class Scrape extends Command
 
     protected const DOMAIN = 'https://store.playstation.com';
     protected const REGIONS = ['en-us', 'en-gb', 'de-de', 'ja-jp'];
-    protected const MAX_PAGES = 4;
+    protected const MAX_PAGES = 2;
 
     /**
      * Execute the console command.
@@ -90,7 +90,6 @@ class Scrape extends Command
         $crawler->filter('.psw-grid-list li')->each(function (Crawler $liNode) use ($games, $region, &$index) {
             $link = $liNode->filter('a')->first()->attr('href');
 
-
             $existingGame = $games->filter(function ($game) use ($link) {
                 if (Str::of($game['link'])->contains(Str::after($link, '/concept/'))) {
                     return $game;
@@ -100,6 +99,7 @@ class Scrape extends Command
             })->first();
 
             if ($existingGame) {
+                $index++;
                 $games = $games->transform(function ($game) use ($region, $index, $link) {
                     if (Str::of($game['link'])->contains(Str::after($link, '/concept/'))) {
                         $game['positions'][$region] = $index;
